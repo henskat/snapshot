@@ -1,3 +1,4 @@
+  
 import { Action } from "./actions";
 
 const initialState = { 
@@ -41,6 +42,17 @@ function reducer(state = initialState, action) {
                 }),
         };
         case Action.FinishSavingImage:
+            return {
+                ...state,
+                images: state.images.map(image => {
+                    if(image.id === action.payload.id) {
+                        return action.payload;
+                    } else {
+                        return image;
+                    }
+                }),
+        };
+        case Action.FinishUploadingImage:
             return {
                 ...state,
                 images: state.images.map(image => {

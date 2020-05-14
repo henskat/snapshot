@@ -5,6 +5,7 @@ export const Action = Object.freeze({
     LeaveEditMode: 'LeaveEditMode',
     FinishSavingImage: 'FinishSavingImage',
     FinishDeletingImage: 'FinishDeletingImage',
+    FinishUploadingImage: 'FinishUploadingImage',
 });
 
 export function loadImages(images) {
@@ -35,7 +36,12 @@ export function leaveEditMode(image) {
     };
 }
 
-
+export function finishUploadingImage(image) {
+    return {
+        type: Action.FinishUploadingImage,
+        payload: image,
+    };
+}
 function checkForErrors(response) {
     if(!response.ok) {
         throw Error(`${response.status}: ${response.statusText}`)
@@ -72,8 +78,8 @@ export function loadImage() {
     };
 }
 
-export function startAddingImage(image_uri_original, image_uri_edited, image_filters, image_caption, image_tags){
-   const image = {image_uri_original, image_uri_edited, image_filters, image_caption, image_tags};
+export function startAddingImage(image_uri_edited, image_filters, image_caption, image_tags){
+   const image = {image_uri_edited, image_filters, image_caption, image_tags};
    const options = {
        method: 'POST',
        headers: {
@@ -96,6 +102,33 @@ export function startAddingImage(image_uri_original, image_uri_edited, image_fil
         .catch(e => console.error(e));
     };
 }
+export function handleImageUpload(images) {
+    console.log(images);
+    // Create an object of formData 
+    const formData = new FormData(); 
+     
+    // Update the formData object 
+    formData.append( 
+        "myFile", 
+        images
+    ); 
+    console.log(formData);
+    return dispatch => {
+        fetch(`${host}/upload/`, {
+            method: 'POST',
+            body: formData
+          })
+          .then(res => res.json())          // convert to plain text
+          .then(data => {
+            if(data.ok) {
+                dispatch(finishUploadingImage(images));
+            }         
+         })
+          .catch(error => {
+            console.error(error)
+          })
+    }
+  }
 
 export function startSavingImage(image){
     const options = {
@@ -138,3 +171,34 @@ export function startDeletingImage(image){
      };
  }
  
+ export const uploadFile = (filename) => {
+    let file = filename.replace(/^.*\\/, "");
+
+    // check file type
+   if(!['image/jpeg', 'image/gif', 'image/png', 'image/svg+xml'].includes(file.type)) {
+        console.log('Only images are allowed.');
+       return;
+   }
+   
+   // check file size (< 2MB)
+   if(file.size > 2 * 1024 * 1024) {
+       console.log('File must be less than 2MB.');
+        return;
+   }
+   
+
+   // add file to FormData object
+   const fd = new FormData();
+   fd.append('avatar', file);
+
+   console.log(fd);
+
+   // send `POST` request
+   fetch(`${host}/image/upload`, {
+       method: 'POST',
+       body: fd
+   })
+   .then(res => res.json())
+   .then(json => console.log(json))
+   .catch(err => console.error(err));
+}
