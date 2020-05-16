@@ -13,6 +13,7 @@ const tags = "";
 function App() {
 
   const images = useSelector(state => state.images);
+  const isWaiting = useSelector(state => state.isWaiting);
   const dispatch = useDispatch();
 useEffect(() => {
     dispatch(loadImage(uri_edited, filters, caption, tags));
@@ -25,6 +26,7 @@ useEffect(() => {
 
   return (
     <div className="image-root">
+      {isWaiting && <div className = "spinner" />}
       <button onClick =  {onAdd}>Add Image</button>
       {images.map(image => <Image key = {image.id} image = {image} />)}
     </div>

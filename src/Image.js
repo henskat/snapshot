@@ -5,12 +5,13 @@ import {enterEditMode, leaveEditMode, startSavingImage, handleImageUpload, start
 export function Image(props) {
     const image = props.image;
     const dispatch = useDispatch();
-
     const [image_uri_edited, setImageUriEdited] = useState(image.image_uri_edited);
     const [image_filters, setImageFilters] = useState(image.image_filters);
     const [image_caption, setImageCaption] = useState(image.image_caption);
     const [image_tags, setImageTags] = useState(image.image_tags);
     
+    let firstUpload = false; 
+
     const onEdit = () => {
         dispatch(enterEditMode(image));
     }
@@ -20,19 +21,22 @@ export function Image(props) {
     }
 
     const onSave = () => {
-
-        // Details of the uploaded file 
-        console.log(image_uri_edited); 
-        
-        dispatch(handleImageUpload(image_uri_edited));
-
+        if(firstUpload && image_uri_edited === "") {
+            return;
+        }
+        if(firstUpload) {
+            dispatch(handleImageUpload(image_uri_edited));
+        }
+        if(image.isEditing && image.image_uri_edited !== ""){
+        }
         dispatch(startSavingImage({
             id: image.id,
-            'image_uri_edited': image_uri_edited.name,
+            'image_uri_edited': firstUpload ? image_uri_edited.name : image_uri_edited,
             image_filters,
             image_caption,
             image_tags,
         }));
+        
     }
 
     const onDelete = () => {
@@ -45,7 +49,7 @@ export function Image(props) {
             return (
             <div className = "image">
                 <div className = "image-left">
-                    <img src = {image.image_uri_edited} />
+                    <img src = {image.image_uri_original} alt = {image.caption}/>
                     <input type = "text" value = {image_filters} onChange = { e => setImageFilters(e.target.value)}/> 
                     <input type = "text" value = {image_caption} onChange = { e => setImageCaption(e.target.value)}/> 
                     <button onClick = {onSave}>save</button>
@@ -57,27 +61,30 @@ export function Image(props) {
                 </div>
             </div>
             );
+        } else {
+            firstUpload = true;
+            return (
+                <div className = "image">
+                    <div className = "image-left">
+                        <input type="file" accept = "png" onChange={ event => setImageUriEdited(event.target.files[0])} />                     
+                        <input type = "text" value = {image_filters} onChange = { e => setImageFilters(e.target.value)}/> 
+                        <input type = "text" value = {image_caption} onChange = { e => setImageCaption(e.target.value)}/> 
+                        <button onClick = {onSave}>save</button>
+                        <button onClick = {onCancel} >cancel</button>
+                        <button className = "delete-button" onClick = {onDelete}>delete</button>
+                    </div>
+                    <div className = "image-right">
+                        <textarea value = {image_tags} onChange = { e => setImageTags(e.target.value)}  />
+                    </div>
+                </div>
+            );
         }
-        return (
-            <div className = "image">
-                <div className = "image-left">
-                    <input type="file" accept = "png" onChange={ event => setImageUriEdited(event.target.files[0])} />                     
-                    <input type = "text" value = {image_filters} onChange = { e => setImageFilters(e.target.value)}/> 
-                    <input type = "text" value = {image_caption} onChange = { e => setImageCaption(e.target.value)}/> 
-                    <button onClick = {onSave}>save</button>
-                    <button onClick = {onCancel} >cancel</button>
-                    <button className = "delete-button" onClick = {onDelete}>delete</button>
-                </div>
-                <div className = "image-right">
-                    <textarea value = {image_tags} onChange = { e => setImageTags(e.target.value)}  />
-                </div>
-            </div>
-        );
     } else {
+        console.log(image.image_uri_original);
         return (
             <div className = "image">
                 <div className = "image-left">
-                    <img src = {image.image_uri_edited} />
+                    <img src = {image.image_uri_original} alt = {image.caption} />
                     <span className = "image-filters">{image.image_filters}</span>
                     <span className = "image-caption">{image.image_caption}</span>
                     <span className = "image-tags">{image.image_tags}</span>

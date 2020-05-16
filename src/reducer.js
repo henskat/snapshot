@@ -11,17 +11,20 @@ function reducer(state = initialState, action) {
         case Action.LoadImages:
             return {
                 ...state,
+                isWaiting: false,
                 images: action.payload,
 
             };
         case Action.FinishAddingImage:
              return {
                  ...state,
+                 isWaiting: false,
                  images: [{...action.payload, isEditing: true}, ...state.images],
             };
         case Action.EnterEditMode:
             return {
                 ...state,
+                isWaiting: false,
                 images: state.images.map(image => {
                     if(image.id === action.payload.id) {
                         return {...image, isEditing: true};
@@ -33,6 +36,7 @@ function reducer(state = initialState, action) {
         case Action.LeaveEditMode:
             return {
                 ...state,
+                isWaiting: false,
                 images: state.images.map(image => {
                     if(image.id === action.payload.id) {
                         return {...image, isEditing: undefined};
@@ -44,6 +48,7 @@ function reducer(state = initialState, action) {
         case Action.FinishSavingImage:
             return {
                 ...state,
+                isWaiting: false,
                 images: state.images.map(image => {
                     if(image.id === action.payload.id) {
                         return action.payload;
@@ -55,6 +60,7 @@ function reducer(state = initialState, action) {
         case Action.FinishUploadingImage:
             return {
                 ...state,
+                isWaiting: false,
                 images: state.images.map(image => {
                     if(image.id === action.payload.id) {
                         return action.payload;
@@ -66,8 +72,14 @@ function reducer(state = initialState, action) {
         case Action.FinishDeletingImage:
             return {
                 ...state,
+                isWaiting: false,
                 images: state.images.filter(image => image.id !== action.payload.id),
         };
+        case Action.StartWaiting:
+            return {
+                ...state,
+                isWaiting: true,
+            }
         default: 
         return state;
     }

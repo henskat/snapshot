@@ -6,7 +6,13 @@ export const Action = Object.freeze({
     FinishSavingImage: 'FinishSavingImage',
     FinishDeletingImage: 'FinishDeletingImage',
     FinishUploadingImage: 'FinishUploadingImage',
+    StartWaiting: 'StartWaiting',
 });
+export function startWaiting() {
+    return {
+        type: Action.StartWaiting,
+    };
+}
 
 export function loadImages(images) {
     return {
@@ -66,6 +72,7 @@ const host = 'https://snapshot.duckdns.org:8442';
 
 export function loadImage() {
     return dispatch => {
+        dispatch(startWaiting());
         fetch (`${host}/image/`)
         .then(checkForErrors)
         .then(response => response.json())
@@ -78,7 +85,7 @@ export function loadImage() {
     };
 }
 
-export function startAddingImage(image_uri_edited, image_filters, image_caption, image_tags){
+export function startAddingImage(image_uri_edited, image_filters, image_caption, image_tags){ 
    const image = {image_uri_edited, image_filters, image_caption, image_tags};
    const options = {
        method: 'POST',
@@ -90,6 +97,7 @@ export function startAddingImage(image_uri_edited, image_filters, image_caption,
    console.log("adding" + JSON.stringify(image));
 
    return dispatch => {
+        dispatch(startWaiting());
         fetch (`${host}/image`, options)
         .then(checkForErrors)
         .then(response => response.json())
@@ -114,6 +122,7 @@ export function handleImageUpload(images) {
     ); 
     console.log(formData);
     return dispatch => {
+        dispatch(startWaiting());
         fetch(`${host}/upload/`, {
             method: 'POST',
             body: formData
@@ -140,6 +149,7 @@ export function startSavingImage(image){
     }
     console.log(JSON.stringify(image));
     return dispatch => {
+        dispatch(startWaiting());
          fetch (`${host}/image/${image.id}`, options)
          .then(checkForErrors)
          .then(response => response.json())
@@ -159,6 +169,7 @@ export function startDeletingImage(image){
     };
     console.log(JSON.stringify(image));
     return dispatch => {
+        dispatch(startWaiting());
          fetch (`${host}/image/${image.id}`, options)
          .then(checkForErrors)
          .then(response => response.json())
