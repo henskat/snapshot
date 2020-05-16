@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
-import {enterEditMode, leaveEditMode, startSavingImage, handleImageUpload, startDeletingImage} from './actions';
+import {enterEditMode, leaveEditMode, startSavingImage, handleImageUpload, startDeletingImage, loadImage} from './actions';
 
 export function Image(props) {
     const image = props.image;
@@ -27,8 +27,7 @@ export function Image(props) {
         if(firstUpload) {
             dispatch(handleImageUpload(image_uri_edited));
         }
-        if(image.isEditing && image.image_uri_edited !== ""){
-        }
+
         dispatch(startSavingImage({
             id: image.id,
             'image_uri_edited': firstUpload ? image_uri_edited.name : image_uri_edited,
@@ -80,7 +79,9 @@ export function Image(props) {
             );
         }
     } else {
-        console.log(image.image_uri_original);
+        if(image.image_uri_original === undefined){
+            dispatch(loadImage());
+        }
         return (
             <div className = "image">
                 <div className = "image-left">
