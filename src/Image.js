@@ -48,15 +48,23 @@ export function Image(props) {
             return (
             <div className = "image">
                 <div className = "image-left">
-                    <img src = {image.image_uri_original} alt = {image.caption}/>
-                    <input type = "text" value = {image_filters} onChange = { e => setImageFilters(e.target.value)}/> 
-                    <input type = "text" value = {image_caption} onChange = { e => setImageCaption(e.target.value)}/> 
-                    <button onClick = {onSave}>save</button>
-                    <button onClick = {onCancel} >cancel</button>
-                    <button className = "delete-button" onClick = {onDelete}>delete</button>
+                    <img className = "image-pic" src = {image.image_uri_original} alt = {image.caption}/>
+                    <span className = "image-caption">Caption: <input type = "text" value = {image_caption} onChange = { e => setImageCaption(e.target.value)}/></span>
+                    <button className = "button-image save" onClick = {onSave}>save</button>
+                    <button className = "button-image-cancel" onClick = {onCancel} >X</button>
+                    <button className = "button-image delete" onClick = {onDelete}>delete</button>
                 </div>
                 <div className = "image-right">
-                    <textarea value = {image_tags} onChange = { e => setImageTags(e.target.value)}  />
+                    <p className = "image-settings">Image Settings </p>
+                    <span className = "image-settings-border">Border color: <input type = "color" value = {image_filters} onChange = { e => setImageFilters(e.target.value)}/></span>
+                    <span className = "image-settings-tags"> Tag:
+                    <select className = "edit-select" value = {image_tags} onChange = { e => setImageTags(e.target.value)} id="filters" name="filters">
+                        <option value="nature" selected >Nature</option>
+                        <option value="animals">Animals</option>
+                        <option value="people">People</option>
+                        <option value="other">Other</option>
+                    </select>
+                    </span>
                 </div>
             </div>
             );
@@ -72,7 +80,7 @@ export function Image(props) {
                         <button onClick = {onCancel} >cancel</button>
                         <button className = "delete-button" onClick = {onDelete}>delete</button>
                     </div>
-                    <div className = "image-right">
+                    <div>
                         <textarea value = {image_tags} onChange = { e => setImageTags(e.target.value)}  />
                     </div>
                 </div>
@@ -85,13 +93,11 @@ export function Image(props) {
         return (
             <div className = "image">
                 <div className = "image-left">
-                    <img src = {image.image_uri_original} alt = {image.caption} />
-                    <span className = "image-filters">{image.image_filters}</span>
-                    <span className = "image-caption">{image.image_caption}</span>
-                    <span className = "image-tags">{image.image_tags}</span>
-                    <button onClick = {onEdit}>edit</button>
+                    <img className = "image-pic" style = {{borderColor: image.image_filters}} src = {image.image_uri_original} alt = {image.caption} />
+                    <span className = "image-caption" style = {{borderColor: image.image_filters, backgroundColor: image.image_filters}} >{image.image_caption}</span>
+                    <button className = "image-edit" onClick = {onEdit}>Click to edit</button>
                 </div>
-                <div className = "image-right">
+                <div>
                     {image.caption}
                 </div>
             </div>

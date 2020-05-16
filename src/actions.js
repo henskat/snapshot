@@ -73,7 +73,7 @@ const host = 'https://snapshot.duckdns.org:8442';
 export function loadImage() {
     return dispatch => {
         dispatch(startWaiting());
-        fetch (`${host}/image/`)
+        fetch (`${host}/image/none`)
         .then(checkForErrors)
         .then(response => response.json())
         .then(data => {
