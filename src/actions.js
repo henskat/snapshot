@@ -70,10 +70,10 @@ export function finishDeletingImage(image) {
 
 const host = 'https://snapshot.duckdns.org:8442';
 
-export function loadImage() {
+export function loadImage(...image) {
     return dispatch => {
         dispatch(startWaiting());
-        fetch (`${host}/image/none`)
+        fetch (`${host}/image/${image[5]}`)
         .then(checkForErrors)
         .then(response => response.json())
         .then(data => {
@@ -85,8 +85,8 @@ export function loadImage() {
     };
 }
 
-export function startAddingImage(image_uri_edited, image_filters, image_caption, image_tags){ 
-   const image = {image_uri_edited, image_filters, image_caption, image_tags};
+export function startAddingImage(image_uri_edited, image_filters, image_fit, image_caption, image_tags){ 
+   const image = {image_uri_edited, image_filters, image_fit, image_caption, image_tags};
    const options = {
        method: 'POST',
        headers: {
@@ -94,7 +94,6 @@ export function startAddingImage(image_uri_edited, image_filters, image_caption,
        },
        body: JSON.stringify(image),
    }
-   console.log("adding" + JSON.stringify(image));
 
    return dispatch => {
         dispatch(startWaiting());
@@ -111,32 +110,31 @@ export function startAddingImage(image_uri_edited, image_filters, image_caption,
     };
 }
 export function handleImageUpload(images) {
-    console.log(images);
-    // Create an object of formData 
-    const formData = new FormData(); 
-     
-    // Update the formData object 
-    formData.append( 
-        "myFile", 
-        images
-    ); 
-    console.log(formData);
-    return dispatch => {
-        dispatch(startWaiting());
-        fetch(`${host}/upload/`, {
-            method: 'POST',
-            body: formData
-          })
-          .then(res => res.json())          // convert to plain text
-          .then(data => {
-            if(data.ok) {
-                dispatch(finishUploadingImage(images));
-            }         
-         })
-          .catch(error => {
-            console.error(error)
-          })
-    }
+    
+        // Create an object of formData 
+        const formData = new FormData(); 
+        
+        // Update the formData object 
+        formData.append( 
+            "myFile", 
+            images
+        ); 
+        return dispatch => {
+            dispatch(startWaiting());
+            fetch(`${host}/upload/`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())          // convert to plain text
+            .then(data => {
+                if(data.ok) {
+                    dispatch(finishUploadingImage(images));
+                }         
+            })
+            .catch(error => {
+                console.error(error)
+            })
+        }
   }
 
 export function startSavingImage(image){
@@ -147,7 +145,6 @@ export function startSavingImage(image){
         },
         body: JSON.stringify(image),
     }
-    console.log(JSON.stringify(image));
     return dispatch => {
         dispatch(startWaiting());
          fetch (`${host}/image/${image.id}`, options)
@@ -167,7 +164,6 @@ export function startDeletingImage(image){
     const options = {
         method: 'DELETE',
     };
-    console.log(JSON.stringify(image));
     return dispatch => {
         dispatch(startWaiting());
          fetch (`${host}/image/${image.id}`, options)
@@ -183,16 +179,17 @@ export function startDeletingImage(image){
  }
  
  export const uploadFile = (filename) => {
+     console.log(filename);
     let file = filename.replace(/^.*\\/, "");
-
+    console.log(file);
     // check file type
-   if(!['image/jpeg', 'image/gif', 'image/png', 'image/svg+xml'].includes(file.type)) {
+   if(!['image/jpeg', 'image/png', 'image/svg+xml'].includes(file.type)) {
         console.log('Only images are allowed.');
        return;
    }
    
    // check file size (< 2MB)
-   if(file.size > 2 * 1024 * 1024) {
+   if(file.size > 2 * 1024 * 100) {
        console.log('File must be less than 2MB.');
         return;
    }
@@ -201,8 +198,6 @@ export function startDeletingImage(image){
    // add file to FormData object
    const fd = new FormData();
    fd.append('avatar', file);
-
-   console.log(fd);
 
    // send `POST` request
    fetch(`${host}/image/upload`, {
